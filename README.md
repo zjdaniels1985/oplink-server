@@ -47,23 +47,28 @@ Oplink Server is a comprehensive communication platform built with Spring Boot 3
 3. **Edit `.env` file** (optional):
    Customize database credentials, Redis settings, and TURN server configuration as needed.
 
-4. **Start all services**:
+4. **Build the application locally**:
    ```bash
-   docker-compose up --build -d
+   mvn clean package -DskipTests
    ```
 
-5. **Access the application**:
+5. **Start all services**:
+   ```bash
+   docker compose up --build -d
+   ```
+
+6. **Access the application**:
    - Web UI: http://localhost:8080
    - API: http://localhost:8080/api
 
-6. **View logs**:
+7. **View logs**:
    ```bash
-   docker-compose logs -f app
+   docker compose logs -f app
    ```
 
-7. **Stop all services**:
+8. **Stop all services**:
    ```bash
-   docker-compose down
+   docker compose down
    ```
 
 ## Local Development Setup
