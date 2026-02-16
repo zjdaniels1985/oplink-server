@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${server.name} + ' - Oplink Server'">Server - Oplink Server</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a th:href="@{/}" class="logo">Oplink</a>
+            <div class="nav-links">
+                <a th:href="@{/servers}">Servers</a>
+                <a th:href="@{/profile}">Profile</a>
+                <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')">Admin</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="btn-logout">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <div class="server-header">
+            <h1 th:text="${server.name}">Server Name</h1>
+            <p th:text="${server.description}">Server Description</p>
+            <p><small>Owner: <span th:text="${server.ownerUsername}">owner</span></small></p>
+        </div>
+        
+        <div class="server-content">
+            <div class="channels-sidebar">
+                <h3>Channels</h3>
+                <div id="channelsList">
+                    <p>Loading channels...</p>
+                </div>
+            </div>
+            
+            <div class="messages-main">
+                <h3>Welcome to <span th:text="${server.name}">Server</span></h3>
+                <p>Select a channel to start chatting.</p>
+            </div>
+        </div>
+    </main>
+    
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const serverId = /*[[${server.id}]]*/ 0;
+        
+        async function loadChannels() {
+            try {
+                const response = await fetch(`/api/servers/${serverId}/channels`);
+                const channels = await response.json();
+                
+                const channelsList = document.getElementById('channelsList');
+                if (channels.length === 0) {
+                    channelsList.innerHTML = '<p>No channels available.</p>';
+                } else {
+                    channelsList.innerHTML = channels.map(channel => 
+                        `<div class="channel-item">${channel.name}</div>`
+                    ).join('');
+                }
+            } catch (error) {
+                console.error('Error loading channels:', error);
+            }
+        }
+        
+        loadChannels();
+        /*]]>*/
+    </script>
+</body>
+</html>
