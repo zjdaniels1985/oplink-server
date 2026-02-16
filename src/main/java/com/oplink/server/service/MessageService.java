@@ -66,8 +66,12 @@ public class MessageService {
         Page<Message> messages;
         
         if (cursor != null && !cursor.isEmpty()) {
-            LocalDateTime cursorTime = LocalDateTime.parse(cursor);
-            messages = messageRepository.findByChannelIdAndCreatedAtBeforeOrderByCreatedAtDesc(channelId, cursorTime, pageable);
+            try {
+                LocalDateTime cursorTime = LocalDateTime.parse(cursor);
+                messages = messageRepository.findByChannelIdAndCreatedAtBeforeOrderByCreatedAtDesc(channelId, cursorTime, pageable);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid cursor format. Expected ISO-8601 datetime format.");
+            }
         } else {
             messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
         }

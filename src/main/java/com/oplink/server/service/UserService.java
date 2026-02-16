@@ -32,11 +32,11 @@ public class UserService {
     @Transactional
     public UserResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new RuntimeException("Username '" + request.getUsername() + "' is already taken");
         }
         
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new RuntimeException("Email '" + request.getEmail() + "' is already registered");
         }
         
         Role userRole = roleRepository.findByName("ROLE_USER")

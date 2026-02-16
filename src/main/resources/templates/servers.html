@@ -61,23 +61,24 @@
         /*<![CDATA[*/
         async function joinServer(serverId) {
             const csrfToken = /*[[${_csrf.token}]]*/ '';
-            const csrfHeader = /*[[${_csrf.headerName}]]*/ '';
+            const csrfHeaderName = /*[[${_csrf.headerName}]]*/ '';
             
             try {
                 const response = await fetch(`/api/servers/${serverId}/join`, {
                     method: 'POST',
                     headers: {
-                        [csrfHeader]: csrfToken
+                        [csrfHeaderName]: csrfToken
                     }
                 });
                 
                 if (response.ok) {
                     window.location.reload();
                 } else {
-                    alert('Failed to join server');
+                    const error = await response.json();
+                    alert('Failed to join server: ' + (error.message || 'Unknown error'));
                 }
             } catch (error) {
-                alert('Error joining server');
+                alert('Error joining server: ' + error.message);
             }
         }
         /*]]>*/
