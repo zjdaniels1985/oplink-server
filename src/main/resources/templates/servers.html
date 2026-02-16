@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servers - Oplink Server</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a th:href="@{/}" class="logo">Oplink</a>
+            <div class="nav-links">
+                <a th:href="@{/servers}">Servers</a>
+                <a th:href="@{/profile}">Profile</a>
+                <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')">Admin</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="btn-logout">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <h1>Servers</h1>
+        
+        <div class="section">
+            <h2>Your Servers</h2>
+            <div class="server-grid">
+                <div th:each="server : ${userServers}" class="server-card">
+                    <a th:href="@{/servers/{id}(id=${server.id})}">
+                        <h3 th:text="${server.name}">Server Name</h3>
+                        <p th:text="${server.description}">Description</p>
+                        <small>Owner: <span th:text="${server.ownerUsername}">owner</span></small>
+                    </a>
+                </div>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(userServers)}" class="empty-state">
+                <p>You haven't joined any servers yet.</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Available Servers</h2>
+            <div class="server-grid">
+                <div th:each="server : ${allServers}" class="server-card">
+                    <h3 th:text="${server.name}">Server Name</h3>
+                    <p th:text="${server.description}">Description</p>
+                    <small>Owner: <span th:text="${server.ownerUsername}">owner</span></small>
+                    <button class="btn btn-primary btn-sm" 
+                            th:onclick="'joinServer(' + ${server.id} + ')'">Join</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        async function joinServer(serverId) {
+            const csrfToken = /*[[${_csrf.token}]]*/ '';
+            const csrfHeader = /*[[${_csrf.headerName}]]*/ '';
+            
+            try {
+                const response = await fetch(`/api/servers/${serverId}/join`, {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+                });
+                
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to join server');
+                }
+            } catch (error) {
+                alert('Error joining server');
+            }
+        }
+        /*]]>*/
+    </script>
+</body>
+</html>
